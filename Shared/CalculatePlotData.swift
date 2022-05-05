@@ -13,78 +13,89 @@ class CalculatePlotData: ObservableObject {
     
     var plotDataModel: PlotDataClass? = nil
     
+    func plotHumanAndZombie(modelType: String, initialPopulation: Double, maxTime: Double, stepSize: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, rho: Double, kappa: Double, sigma: Double, gamma: Double, cureRate: Double, killRatio: Double) {
+        plotDataModel!.changingPlotParameters.yMax = initialPopulation * 1.10
+        plotDataModel!.changingPlotParameters.yMin = -0.1 * initialPopulation
+        plotDataModel!.changingPlotParameters.xMax = 1.1 * maxTime
+        plotDataModel!.changingPlotParameters.xMin = -0.1 * maxTime
+        plotDataModel!.changingPlotParameters.xLabel = "Time (days)"
+        plotDataModel!.changingPlotParameters.yLabel = "Population (thousands)"
+        plotDataModel!.changingPlotParameters.lineColor = .blue()
+        plotDataModel!.changingPlotParameters.title = "Human and zombie population"
 
-    func plotYEqualsX()
-    {
-        
-        //set the Plot Parameters
-        plotDataModel!.changingPlotParameters.yMax = 10.0
-        plotDataModel!.changingPlotParameters.yMin = -5.0
-        plotDataModel!.changingPlotParameters.xMax = 10.0
-        plotDataModel!.changingPlotParameters.xMin = -5.0
-        plotDataModel!.changingPlotParameters.xLabel = "x"
-        plotDataModel!.changingPlotParameters.yLabel = "y"
-        plotDataModel!.changingPlotParameters.lineColor = .red()
-        plotDataModel!.changingPlotParameters.title = " y = x"
-        
         plotDataModel!.zeroData()
         var plotData :[plotDataType] =  []
+        var plotData2 :[plotDataType] = []
         
+
+        var resultsArray: [(time: Double, susceptible: Double, zombie: Double)] = []
+           // plot results array
+           if (modelType == "Basic Model") {
+               resultsArray = basicModel(alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+           }
+           else if (modelType == "Latent Infection") {
+               resultsArray =  latentInfection(rho: rho, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+           }
+           else if (modelType == "Quarantine") {
+               resultsArray = quarantineModel(kappa: kappa, sigma: sigma, gamma: gamma, rho: rho, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+           }
+           else if (modelType == "Treatment") {
+               resultsArray = treatmentModel(cureRate: cureRate, rho: rho, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+           }
+           else if (modelType == "Impulsive Eradication") {
+               resultsArray = impulsiveEradication(killRatio: killRatio, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+           }
+           else {
+               print("No model type chosen")
+           }
+           
+        let n = resultsArray.count
         
-        for i in 0 ..< 120 {
+        for i in 0 ..< n {
 
             //create x values here
+            let j = n - 1 - i
 
-            let x = -2.0 + Double(i) * 0.2
-
+            let x1 = resultsArray[j].time
+            let x2 = resultsArray[i].time
+            
         //create y values here
 
-        let y = x
-
-
-            let dataPoint: plotDataType = [.X: x, .Y: y]
+            let y = resultsArray[j].susceptible
+            let z = resultsArray[i].zombie
+            
+            let dataPoint: plotDataType = [.X: x1, .Y: y]
+            let dataPoint2: plotDataType = [.X: x2, .Y: z]
             plotData.append(contentsOf: [dataPoint])
-        
+            plotData2.append(contentsOf: [dataPoint2])
         }
         
         plotDataModel!.appendData(dataPoint: plotData)
         
+        plotDataModel!.appendData(dataPoint: plotData2)
         
-    }
-    
-    
-    func ploteToTheMinusX()
-    {
+   /*     plotDataModel!.changingPlotParameters.lineColor = .red()
         
-        //set the Plot Parameters
-        plotDataModel!.changingPlotParameters.yMax = 10
-        plotDataModel!.changingPlotParameters.yMin = -3.0
-        plotDataModel!.changingPlotParameters.xMax = 10.0
-        plotDataModel!.changingPlotParameters.xMin = -3.0
-        plotDataModel!.changingPlotParameters.xLabel = "x"
-        plotDataModel!.changingPlotParameters.yLabel = "y = exp(-x)"
-        plotDataModel!.changingPlotParameters.lineColor = .blue()
-        plotDataModel!.changingPlotParameters.title = "exp(-x)"
-
         plotDataModel!.zeroData()
-        var plotData :[plotDataType] =  []
-        for i in 0 ..< 60 {
+        plotData =  []
+        
+        for i in 0 ..< n {
 
             //create x values here
 
-            let x = -2.0 + Double(i) * 0.2
-
+            let x = resultsArray[i].time
+            
         //create y values here
 
-        let y = exp(-x)
+            let y = resultsArray[i].zombie
             
             let dataPoint: plotDataType = [.X: x, .Y: y]
             plotData.append(contentsOf: [dataPoint])
         }
         
         plotDataModel!.appendData(dataPoint: plotData)
+    */
         
-        return
     }
     
 }

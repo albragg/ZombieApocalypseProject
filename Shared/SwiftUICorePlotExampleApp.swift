@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct SwiftUICorePlotExampleApp: App {
+struct CallItSomethingElse: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
