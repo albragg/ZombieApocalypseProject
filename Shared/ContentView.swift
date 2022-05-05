@@ -51,7 +51,9 @@ struct ContentView: View {
     // eradication
     @State private var killRatio: Double? = 0.25
     @State private var editedKillRatio: Double? = 0.25
-
+    // add in birth rate
+    @State private var pi: Double? = 0.0
+    @State private var editedPi: Double? = 0.0
  
     private var doubleFormatter: NumberFormatter = {
             let f = NumberFormatter()
@@ -156,7 +158,7 @@ struct ContentView: View {
             
                     Text(verbatim: "Natural human death rate (delta):")
                         .padding()
-                    TextField("Delta, between zero and one", value: $editedDelta, formatter: doubleFormatter, onCommit: {
+                    TextField("Delta, should be a small decimal", value: $editedDelta, formatter: doubleFormatter, onCommit: {
                         self.delta = self.editedDelta
                     })
             
@@ -170,6 +172,18 @@ struct ContentView: View {
                         .padding()
                     TextField("Zeta, between zero and one", value: $editedZeta, formatter: doubleFormatter, onCommit: {
                         self.zeta = self.editedZeta
+                    })
+            
+                        .padding()
+                
+                }
+                HStack{
+                
+            
+                    Text(verbatim: "Human birth rate (pi):")
+                        .padding()
+                    TextField("Birth rate, enter zero or a small decimal", value: $editedPi, formatter: doubleFormatter, onCommit: {
+                        self.pi = self.editedPi
                     })
             
                         .padding()
@@ -293,7 +307,7 @@ struct ContentView: View {
             Divider()
             
             
-            Button("Plot Selected Model", action: {self.calculateModel(modelType: modelType, initialPopulation: initialPopulation!, maxTime: maxTime!, stepSize: stepSize!, alpha: alpha!, beta: beta!, delta: delta!, zeta: zeta!, rho: rho!, kappa: kappa!, sigma: sigma!, gamma: gamma!, cureRate: cureRate!, killRatio: killRatio!)} )
+            Button("Plot Selected Model", action: {self.calculateModel(modelType: modelType, initialPopulation: initialPopulation!, maxTime: maxTime!, stepSize: stepSize!, alpha: alpha!, beta: beta!, delta: delta!, zeta: zeta!, rho: rho!, kappa: kappa!, sigma: sigma!, gamma: gamma!, cureRate: cureRate!, killRatio: killRatio!, pi: pi!)} )
                 .padding()
                 
         }
@@ -301,12 +315,12 @@ struct ContentView: View {
 
 
     
-    func calculateModel(modelType: String, initialPopulation: Double, maxTime: Double, stepSize: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, rho: Double, kappa: Double, sigma: Double, gamma: Double, cureRate: Double, killRatio: Double){
+    func calculateModel(modelType: String, initialPopulation: Double, maxTime: Double, stepSize: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, rho: Double, kappa: Double, sigma: Double, gamma: Double, cureRate: Double, killRatio: Double, pi: Double){
         
         //pass the plotDataModel to the dataCalculator
         dataCalculator.plotDataModel = self.plotDataModel
         //Calculate the new plotting data and place in the plotDataModel
-        dataCalculator.plotHumanAndZombie(modelType: modelType, initialPopulation: initialPopulation, maxTime: maxTime, stepSize: stepSize, alpha: alpha, beta: beta, delta: delta, zeta: zeta, rho: rho, kappa: kappa, sigma: sigma, gamma: gamma, cureRate: cureRate, killRatio: killRatio)
+        dataCalculator.plotHumanAndZombie(modelType: modelType, initialPopulation: initialPopulation, maxTime: maxTime, stepSize: stepSize, alpha: alpha, beta: beta, delta: delta, zeta: zeta, rho: rho, kappa: kappa, sigma: sigma, gamma: gamma, cureRate: cureRate, killRatio: killRatio, pi: pi)
         
     }
    

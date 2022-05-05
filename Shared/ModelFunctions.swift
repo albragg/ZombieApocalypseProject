@@ -10,7 +10,7 @@ import Foundation
 // this is the percent of humans remaining where we start plotting to cutoff extra space
 let cutoffPercent = 0.997
 
-func basicModel(alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double) -> [(time: Double, susceptible: Double, zombie: Double)] {
+func basicModel(alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double, pi: Double) -> [(time: Double, susceptible: Double, zombie: Double)] {
     var removed = 0.0
     var susceptible = initialPopulation
     var zombie = 0.0
@@ -21,7 +21,7 @@ func basicModel(alpha: Double, beta: Double, delta: Double, zeta: Double, initia
 // using eulers method
     var n = 1
     while(n <= Int(numberOfSteps)) {
-        let sPrime = -1.0 * susceptible * (beta * zombie + delta)
+        let sPrime = pi - 1.0 * susceptible * (beta * zombie + delta)
         let zPrime = susceptible * zombie * (beta - alpha) + zeta * removed
         let rPrime = (delta + alpha * zombie) * susceptible - zeta * removed
         susceptible += stepSize * sPrime
@@ -40,7 +40,7 @@ func basicModel(alpha: Double, beta: Double, delta: Double, zeta: Double, initia
 
 
 
-func latentInfection(rho: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double) -> [(time: Double, susceptible: Double, zombie: Double)] {
+func latentInfection(rho: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double, pi: Double) -> [(time: Double, susceptible: Double, zombie: Double)] {
     // i dont know why i have to do this
     let rhoInThousands = rho * 1000.0
     var removed = 0.0
@@ -55,7 +55,7 @@ func latentInfection(rho: Double, alpha: Double, beta: Double, delta: Double, ze
 // using eulers method
     var n = 1
     while( n <= Int(numberOfSteps)) {
-        let sPrime = -1.0 * susceptible * (beta * zombie + delta)
+        let sPrime = pi - 1.0 * susceptible * (beta * zombie + delta)
         let iPrime = beta * susceptible * zombie - infected * (rhoInThousands + delta)
         let zPrime = rhoInThousands * infected - susceptible * zombie * alpha + zeta * removed
         let rPrime = (delta + alpha * zombie) * susceptible + delta * infected - zeta * removed
@@ -75,7 +75,7 @@ func latentInfection(rho: Double, alpha: Double, beta: Double, delta: Double, ze
     return dataPoints
 }
  
-func quarantineModel(kappa: Double, sigma: Double, gamma: Double, rho: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double) -> [(time: Double, susceptible: Double, zombie: Double)] {
+func quarantineModel(kappa: Double, sigma: Double, gamma: Double, rho: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double, pi: Double) -> [(time: Double, susceptible: Double, zombie: Double)] {
     let rhoNew = rho * 1000.0
     var removed = 0.0
     var infected = 0.0
@@ -89,7 +89,7 @@ func quarantineModel(kappa: Double, sigma: Double, gamma: Double, rho: Double, a
 // using eulers method
     var n = 1
     while ( n <= Int(numberOfSteps)) {
-        let sPrime = -1.0 * susceptible * (beta * zombie + delta)
+        let sPrime = pi - 1.0 * susceptible * (beta * zombie + delta)
         let iPrime = beta * susceptible * zombie - infected * (rhoNew + delta + kappa)
         let zPrime = rhoNew * infected - susceptible * zombie * alpha + zeta * removed - sigma * zombie
         let rPrime = (delta + alpha * zombie) * susceptible + delta * infected - zeta * removed + gamma * quarantined
@@ -111,7 +111,7 @@ func quarantineModel(kappa: Double, sigma: Double, gamma: Double, rho: Double, a
 
 
 
-func treatmentModel(cureRate: Double, rho: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double) -> [(time: Double, susceptible: Double, zombie: Double)] {
+func treatmentModel(cureRate: Double, rho: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double, pi: Double) -> [(time: Double, susceptible: Double, zombie: Double)] {
     // again i am multiplying rho by 1000 for some reason
     let rhoNew = rho * 1000.0
     var removed = 0.0
@@ -125,7 +125,7 @@ func treatmentModel(cureRate: Double, rho: Double, alpha: Double, beta: Double, 
 // using eulers method
     var n = 1
     while (n <= Int(numberOfSteps)) {
-        let sPrime = -1.0 * susceptible * (beta * zombie + delta) + cureRate * zombie
+        let sPrime = pi - 1.0 * susceptible * (beta * zombie + delta) + cureRate * zombie
         let iPrime = beta * susceptible * zombie - infected * (rhoNew + delta)
         let zPrime = rhoNew * infected - susceptible * zombie * alpha + zeta * removed - cureRate * zombie
         let rPrime = (delta + alpha * zombie) * susceptible + delta * infected - zeta * removed
@@ -145,10 +145,23 @@ func treatmentModel(cureRate: Double, rho: Double, alpha: Double, beta: Double, 
 
 
 
-func impulsiveEradication(killRatio: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double) -> [(time: Double, susceptible: Double, zombie: Double)]{
+func impulsiveEradication(killRatio: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, initialPopulation: Double, stepSize: Double, maxTime: Double, pi: Double) -> [(time: Double, susceptible: Double, zombie: Double)]{
     var numberOfKills = 1.0 / killRatio
-    if(killRatio >= 0.5){
+    if((killRatio >= 0.5) && (killRatio < 1.0)){
+        // if we can kill off more than half of zombies initially, we only need to do
         numberOfKills = 2.0
+    }
+    else if (killRatio >= 1.0){
+        numberOfKills = 1.0
+        print("Kill ratio is greater than 1, this is not allowed")
+    }
+    else {
+        let intNumberOfKills = Int(numberOfKills)
+        numberOfKills = Double(intNumberOfKills)
+        // make sure we have enough kills within our time interval, add one if we dont get close enough
+        if(numberOfKills * killRatio < 0.99){
+            numberOfKills += 1.0
+        }
     }
     let killInterval = maxTime / numberOfKills
     let stepsUntilKill = Int(killInterval / stepSize)
@@ -170,7 +183,7 @@ func impulsiveEradication(killRatio: Double, alpha: Double, beta: Double, delta:
             print(n, "kill commited", zombie)
         }
         else {
-            let sPrime = -1.0 * susceptible * (beta * zombie + delta)
+            let sPrime = pi - 1.0 * susceptible * (beta * zombie + delta)
             let zPrime = susceptible * zombie * (beta - alpha) + zeta * removed
             let rPrime = (delta + alpha * zombie) * susceptible - zeta * removed
             susceptible += stepSize * sPrime

@@ -13,7 +13,7 @@ class CalculatePlotData: ObservableObject {
     
     var plotDataModel: PlotDataClass? = nil
     
-    func plotHumanAndZombie(modelType: String, initialPopulation: Double, maxTime: Double, stepSize: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, rho: Double, kappa: Double, sigma: Double, gamma: Double, cureRate: Double, killRatio: Double) {
+    func plotHumanAndZombie(modelType: String, initialPopulation: Double, maxTime: Double, stepSize: Double, alpha: Double, beta: Double, delta: Double, zeta: Double, rho: Double, kappa: Double, sigma: Double, gamma: Double, cureRate: Double, killRatio: Double, pi: Double) {
         plotDataModel!.changingPlotParameters.yMax = initialPopulation * 1.10
         plotDataModel!.changingPlotParameters.yMin = -0.1 * initialPopulation
         plotDataModel!.changingPlotParameters.xMax = 1.1 * maxTime
@@ -31,19 +31,19 @@ class CalculatePlotData: ObservableObject {
         var resultsArray: [(time: Double, susceptible: Double, zombie: Double)] = []
            // plot results array
            if (modelType == "Basic Model") {
-               resultsArray = basicModel(alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+               resultsArray = basicModel(alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime, pi: pi)
            }
            else if (modelType == "Latent Infection") {
-               resultsArray =  latentInfection(rho: rho, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+               resultsArray =  latentInfection(rho: rho, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime, pi: pi)
            }
            else if (modelType == "Quarantine") {
-               resultsArray = quarantineModel(kappa: kappa, sigma: sigma, gamma: gamma, rho: rho, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+               resultsArray = quarantineModel(kappa: kappa, sigma: sigma, gamma: gamma, rho: rho, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime, pi: pi)
            }
            else if (modelType == "Treatment") {
-               resultsArray = treatmentModel(cureRate: cureRate, rho: rho, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+               resultsArray = treatmentModel(cureRate: cureRate, rho: rho, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime, pi: pi)
            }
            else if (modelType == "Impulsive Eradication") {
-               resultsArray = impulsiveEradication(killRatio: killRatio, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime)
+               resultsArray = impulsiveEradication(killRatio: killRatio, alpha: alpha, beta: beta, delta: delta, zeta: zeta, initialPopulation: initialPopulation, stepSize: stepSize, maxTime: maxTime, pi: pi)
            }
            else {
                print("No model type chosen")
