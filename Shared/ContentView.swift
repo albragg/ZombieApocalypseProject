@@ -22,8 +22,8 @@ struct ContentView: View {
     //usual initial parameters
     @State private var initialPopulation: Double? = 500.0
     @State private var editedInitialPopulation: Double? = 500.0
-    @State private var stepSize: Double? = 0.001
-    @State private var editedStepSize: Double? = 0.001
+    @State private var stepSize: Double? = 0.01
+    @State private var editedStepSize: Double? = 0.01
     @State private var maxTime: Double? = 10.0
     @State private var editedMaxTime: Double? = 10.0
     // basic model parameters

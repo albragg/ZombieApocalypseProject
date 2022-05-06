@@ -46,7 +46,7 @@ class PlotDataClass: NSObject, ObservableObject {
         let beta = 0.0095
         let delta = 0.0001
         let zeta = 0.0001
-        let stepSize = 0.001
+        let stepSize = 0.01
         let maxTime = 10.0
         let pi = 0.0
         
